@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/meesboeijen/Development/experiments/homerun/package.json: Unexpected token } in JSON at position 140
+  SyntaxError: /Users/meesboeijen/Development/experiments/homehunt/package.json: Unexpected token } in JSON at position 140
       at JSON.parse (<anonymous>)
       at /Users/meesboeijen/.nvm/versions/node/v16.16.0/lib/node_modules/yarn/lib/cli.js:1629:59
       at Generator.next (<anonymous>)
@@ -23,7 +23,7 @@ Trace:
 
 npm manifest: 
   {
-    "name": "homerun",
+    "name": "homehunt",
     "version": "1.0.0",
     "main": "dist/app.js",
     "scripts": {
