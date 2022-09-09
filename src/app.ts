@@ -29,7 +29,7 @@ cron.schedule(
 );
 
 cron.schedule(
-  "22 * * *",
+  "0 22 * * *",
   () => {
     sendMessage(
       `Daily update: I successfully checked for new listing ${CHECKED_AMOUNT} times today. Out of ${CHECKED_HOUSES} houses available, ${NEW_HOUSES} were newly listed.`
