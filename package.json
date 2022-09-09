@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {
-    "start": "ts-node src/app.ts"
+    "start": "pm2 start -f src/app.ts"
   },
   "devDependencies": {
     "@types/node": "^18.7.15",
