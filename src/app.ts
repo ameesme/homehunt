@@ -13,11 +13,30 @@ if (!process.env.BOT_TOKEN || !process.env.CHAT_ID) {
 }
 
 const telegram: Telegram = new Telegram(process.env.BOT_TOKEN as string);
+let CHECKED_AMOUNT = 0;
+let CHECKED_HOUSES = 0;
+let NEW_HOUSES = 0;
 
 cron.schedule(
-  "0 9,11,13,15,17,19,22 * * *",
+  "0 9,11,13,15,17,19,20 * * *",
   () => {
     startScrape(true);
+  },
+  {
+    scheduled: true,
+    timezone: "Europe/Amsterdam",
+  }
+);
+
+cron.schedule(
+  "22 * * *",
+  () => {
+    sendMessage(
+      `Daily update: I successfully checked for new listing ${CHECKED_AMOUNT} times today. Out of ${CHECKED_HOUSES} houses available, ${NEW_HOUSES} were newly listed.`
+    );
+    CHECKED_AMOUNT = 0;
+    CHECKED_HOUSES = 0;
+    NEW_HOUSES = 0;
   },
   {
     scheduled: true,
@@ -137,12 +156,31 @@ const startScrape = async (retry: boolean) => {
     })
     .slice(1);
 
-  const additionalPageResults = await Promise.all(additionalRequestPromises);
+  let additionalPageResults;
+  try {
+    additionalPageResults = await Promise.all(additionalRequestPromises);
+  } catch (e) {
+    console.log(e);
+    if (retry) {
+      sendMessage("I could not fetch homes just now. Will retry in a bit.");
+      setTimeout(() => {
+        startScrape(false);
+      }, 1000 * 60 * 5);
+    } else {
+      telegram.sendMessage(
+        process.env.CHAT_ID!,
+        "I could not fetch homes after trying a second time. Giving up for now."
+      );
+    }
+    return;
+  }
   additionalPageResults.forEach((result) =>
     combinedHouses.push(...result.houses)
   );
 
   console.log(`Fetched ${combinedHouses.length} houses`);
+  CHECKED_AMOUNT = CHECKED_AMOUNT + 1;
+  CHECKED_HOUSES = combinedHouses.length;
 
   // Reading previously listed houses
   const previousHouseData = await fs.readFile(path, "utf-8");
@@ -160,6 +198,7 @@ const startScrape = async (retry: boolean) => {
     });
 
   if (filteredHouses.length > 0) {
+    NEW_HOUSES = NEW_HOUSES + filteredHouses.length;
     telegram.sendChatAction(process.env.CHAT_ID!, "typing");
     console.log(`Found ${filteredHouses.length} new houses!`);
     sendMessage(
