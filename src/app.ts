@@ -90,6 +90,7 @@ const startScrape = async (retry: boolean) => {
   } else {
     console.log("Starting redundant fetch");
   }
+  console.log(`Check ${CHECKED_AMOUNT}, ${new Date()}`);
   // Fetch and parse first result
   let initialFetchResult;
   let combinedHouses: House[] = [];
@@ -228,6 +229,8 @@ const startScrape = async (retry: boolean) => {
 };
 
 checkFile();
+setTimeout(() => {
+  startScrape(true);
+}, 1000);
 
 console.log("Homehunt started");
-sendMessage("Homehunt started!");
