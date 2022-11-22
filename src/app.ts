@@ -1,12 +1,13 @@
 import * as dotenv from "dotenv";
 dotenv.config();
-
+import http from "http";
 import axios from "axios";
 import { Telegram } from "telegraf";
 import cron from "node-cron";
 import { promises as fs } from "fs";
 import { HomeResponseObject, House } from "./types";
 // import { dummyHouses } from "./dummyData";
+var agent = new http.Agent({ family: 4 });
 
 if (!process.env.BOT_TOKEN || !process.env.CHAT_ID) {
   throw new Error("Make sure Bot-token and chat-ID are set");
@@ -106,6 +107,7 @@ const startScrape = async (retry: boolean) => {
       {
         headers,
         method: "POST",
+        httpAgent: agent,
       }
     );
   } catch (e) {
@@ -147,6 +149,7 @@ const startScrape = async (retry: boolean) => {
           {
             headers,
             method: "POST",
+            httpAgent: agent,
           }
         );
         return result.data;
